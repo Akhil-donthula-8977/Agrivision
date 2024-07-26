@@ -12,8 +12,12 @@ import Footer from "@/components/Footer";
 import LeadershipSection from "@/components/HomePage/Leader/LeadershipSection";
 import { RevealFromBottom } from "@/components/Framer/RevealFromBottom";
 import AuthForm from "@/components/AuthForm";
-
-export default function Home() {
+import {  auth } from "@/auth";
+import { redirect } from "next/navigation";
+export default async function Home() {
+  const session = await auth()
+  console.log(session);
+  if (session) return redirect("/predictors");
   return (
     <main className={cn('flex flex-col h-screen max-h-screen', nunito.className)}>
       <div className="bg-green-800 text-white p-2 w-full">
@@ -26,10 +30,7 @@ export default function Home() {
           <Reveal CustomClass="flex-1 flex items-center justify-center sm:justify-center rounded-r-[30px]">
             <HomePageMainHeader></HomePageMainHeader>
           </Reveal>
-        </div>
-        
-     <AuthForm></AuthForm>
- 
+        </div> 
 
         <div className="flex-1 hidden sm:flex items-center justify-center sm:w-[500px] sm:h-[300px]">
           <Image width={550} priority height={350} src={img} alt="paper" className="sm:block hidden rounded-[10px]" />

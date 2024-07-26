@@ -19,9 +19,8 @@ const PredictorSideNavigationBar = () => {
     return (
         <div
 
-            className={`  bg-green-800 text-white  h-dvh top-10  ${isOpen ? 'w-64' : 'w-16'} transition-all duration-300 bg-black text-white ${nunito.className}`}
-        >
-            {/* Sidebar Toggle Button */}
+            className={`  bg-green-800 text-white  h-dvh top-10 mr-65  ${isOpen ? 'w-64' : 'w-16'} transition-all duration-300 bg-black text-white ${nunito.className}`}>
+         
             <div className="flex flex-col justify-between h-full">
                 <div className='flex justify-end'>
                     <button

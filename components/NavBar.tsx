@@ -6,6 +6,8 @@ import Link from 'next/link';
 import { AiOutlineClose, AiOutlineMenu } from 'react-icons/ai';
 import Image from 'next/image';
 import logo from "@/public/AgriVisionLogojpg.jpg"
+import { signOut } from "next-auth/react"
+import { Button } from './ui/button';
 const Navbar = () => {
   // State to manage the navbar's visibility
   const [nav, setNav] = useState(false);
@@ -30,7 +32,7 @@ const Navbar = () => {
       <Image src={logo} width={60} height={60} alt='logo' className={cn('relative left-10 ')}></Image>
       </Link>
       {/* Desktop Navigation */}
-      <ul className='hidden md:flex'>
+      <ul className='hidden md:flex items-center'>
         {navItems.map(item => (
           <li
             key={item.id}
@@ -39,6 +41,7 @@ const Navbar = () => {
             {item.text}
           </li>
         ))}
+        <Button onClick={() => signOut()}>Signout</Button>
       </ul>
 
       {/* Mobile Navigation Icon */}
@@ -54,6 +57,7 @@ const Navbar = () => {
             : 'ease-in-out w-[60%] duration-500 fixed top-0 bottom-0 left-[-100%]'
         }
       >
+        
         {/* Mobile Logo */}
         <h1 className='w-full text-3xl font-bold text-[#00df9a] m-4'>REACT.</h1>
 
@@ -66,6 +70,7 @@ const Navbar = () => {
             {item.text}
           </li>
         ))}
+        
       </ul>
     </div>
   );

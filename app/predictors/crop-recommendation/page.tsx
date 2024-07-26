@@ -2,12 +2,17 @@
 import { nunito } from "@/lib/fontsCustom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { boolean, z } from "zod";
 import StackHorizontal from "@/components/ui/StackHorizontal";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import CustomFormField from "@/components/customFormComponents/CustomFormField";
 import { cn } from "@/lib/utils";
+import { useSession } from "next-auth/react";
+import { Modal } from "@/components/Modal";
+import { useState } from "react";
+import YieldResultCard from "@/components/cards/YieldResultCard";
+
 const formSchema = z.object({
     Nitrogen: z.number().gte(0, {
         message: "Invalid value",
@@ -60,23 +65,62 @@ export default function ProfileForm() {
             rainfall: 100,
         },
     });
-
+    const [isOpen,setIsOpen]=useState(false);
     const { handleSubmit, formState: { isSubmitting, isValid } } = form;
-
-    function onSubmit(values: z.infer<typeof formSchema>) {
-
-        return new Promise(resolve => {
-            setTimeout(() => {
-                console.log(values);
-                resolve(true);
-                console.log(isValid)
-            }, 2000);
-        });
-
+    const session=useSession();
+    const [data,setData]=useState([]);
+    async function onSubmit(values: z.infer<typeof formSchema>) {
+        try {
+            const query={
+                N:values.Nitrogen,
+                P:values.phosporous,
+                K:values.Potassium,
+                temperature:values.temperature,
+                humidity:values.Humidity,
+                ph:values.PH,
+                rainfall:values.rainfall
+            }
+              const response = await fetch('http://127.0.0.1:5000/api/crop_recommendation/', {
+                  method: 'POST', // specify the HTTP method
+                  headers: {
+                      'Content-Type': 'application/json' // set the content type to JSON
+                  },
+                  body: JSON.stringify(query) // convert the body object to a JSON string
+              });
+            //   {
+            //     "Crop": "Coconut",
+            //     "Season": "Whole Year",
+            //     "State": "Assam",
+            //     "Area": 19656,
+            //     "Production": 126905000,
+            //     "Fertilizer": 1970661.52,
+            //     "Pesticide": 6093.36
+            // }
+              if (!response.ok) {
+                  throw new Error(`Network response was not ok: ${response.statusText}`);
+              }
+      
+              const data = await response.json(); // parse the JSON response
+      
+              console.log(data); // handle the parsed JSON data
+      
+              // Ensure data is properly structured and contains the prediction
+              if (data && data.prediction) {
+                  console.log(data.prediction); // handle the prediction data
+                  setData(data.prediction);
+              } else {
+                  console.error('Prediction data is missing from the response:', data);
+              }
+              
+              setIsOpen(true);
+          } catch (error) {
+              console.error('There was a problem with the fetch operation:', error); // handle errors
+          }
     }
 
     return (
         <section className="flex flex-col justify-center mt-10 mb-5">
+           <Modal  isOpen={isOpen} onClose={() => setIsOpen(false)} component={<YieldResultCard data={data} onClose={() => setIsOpen(false)}></YieldResultCard>}></Modal>
             <div className="flex justify-center">
                 <Form {...form}>
                     <form onSubmit={handleSubmit(onSubmit)} className={cn("space-y-4 ", nunito.className)}>

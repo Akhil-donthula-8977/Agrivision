@@ -1,7 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
 import img2 from "@/public/download_arrow.png";
-
+import AuthForm from './AuthForm';
 const HomePageMainHeader = () => {
     return (
         <div className="text-4xl font-bold tracking-tight flex flex-col items-center justify-center sm:text-6xl md:text-[70px] p-6">
@@ -16,9 +16,8 @@ const HomePageMainHeader = () => {
             <div className='text-sm sm:w-[80%] tracking-wide mt-6 leading-[2rem] text-center'>
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
             </div>
-            <div className='mt-10'>
-                <Image src={img2} height={50} width={50} alt="m" className="mix-blend-multiply animate-bounce" />
-            </div>
+            
+            <AuthForm></AuthForm>
         </div>
     );
 }

@@ -1,5 +1,5 @@
 "use client";
-import React from 'react';
+import React, { useState } from 'react';
 import { nunito } from '@/lib/fontsCustom';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from "react-hook-form";
@@ -11,7 +11,8 @@ import { cn } from "@/lib/utils";
 import CustomFormField from "@/components/customFormComponents/CustomFormField";
 import CustomDropDown from '@/components/customFormComponents/CustomDropDown';
 import { crop_labels, state_labels, season_labels } from '@/constants/predictorConstants';
-
+import { Modal } from '@/components/Modal';
+import YieldResultCard from '@/components/cards/YieldResultCard';
 const formSchema = z.object({
   Crop: z.string(),
   Season: z.string(),
@@ -20,33 +21,64 @@ const formSchema = z.object({
   Production: z.number().min(0, "Production must be a positive number"),
   Fertilizer: z.number().min(0, "Fertilizer must be a positive number"),
   Pesticide: z.number().min(0, "Pesticide must be a positive number"),
-  Temperature: z.number().min(-50, "Temperature must be a valid number").max(50, "Temperature must be a valid number"),
-  PH: z.number().min(0, "PH must be a valid number").max(14, "PH must be a valid number"),
-  Humidity: z.number().min(0, "Humidity must be a valid number").max(100, "Humidity must be a valid number"),
-  Rainfall: z.number().min(0, "Rainfall must be a positive number"),
+  
 });
-
+interface results{
+  prediction:Array<number>
+}
 const Page = () => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     mode: "onChange"
   });
-
+  const [data,setData]=useState([]);
   const { handleSubmit, formState: { isSubmitting, isValid, errors } } = form;
+  const [isOpen,setIsOpen]=useState(false);
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    return new Promise(resolve => {
-      setTimeout(() => {
-        console.log(values);
-        resolve(true);
-        console.log(isValid);
-      }, 2000);
-    });
-  }
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      console.log(values)
+        const response = await fetch('http://127.0.0.1:5000/api/yield/', {
+            method: 'POST', // specify the HTTP method
+            headers: {
+                'Content-Type': 'application/json' // set the content type to JSON
+            },
+            body: JSON.stringify(values) // convert the body object to a JSON string
+        });
+      //   {
+      //     "Crop": "Coconut",
+      //     "Season": "Whole Year",
+      //     "State": "Assam",
+      //     "Area": 19656,
+      //     "Production": 126905000,
+      //     "Fertilizer": 1970661.52,
+      //     "Pesticide": 6093.36
+      // }
+        if (!response.ok) {
+            throw new Error(`Network response was not ok: ${response.statusText}`);
+        }
 
+        const data = await response.json(); // parse the JSON response
+
+        console.log(data); // handle the parsed JSON data
+
+        // Ensure data is properly structured and contains the prediction
+        if (data && data.prediction) {
+            console.log(data.prediction); // handle the prediction data
+            setData(data.prediction);
+        } else {
+            console.error('Prediction data is missing from the response:', data);
+        }
+        
+        setIsOpen(true);
+    } catch (error) {
+        console.error('There was a problem with the fetch operation:', error); // handle errors
+    }
+}
   return (
     <section className="flex mt-10 mb-5">
       <div className="flex justify-center flex-1">
+      <Modal  isOpen={isOpen} onClose={() => setIsOpen(false)} component={<YieldResultCard data={data} onClose={() => setIsOpen(false)}></YieldResultCard>}></Modal>
         <Form {...form}>
           <form onSubmit={handleSubmit(onSubmit)} className={cn("space-y-4 ", nunito.className)}>
             <CustomDropDown
@@ -112,42 +144,8 @@ const Page = () => {
                 type="number"
               />
             </StackHorizontal>
-            <StackHorizontal className="space-x-5">
-              <CustomFormField
-                control={form.control}
-                name="Temperature"
-                label="Temperature"
-                description="Enter the temperature value"
-                placeholder="Temperature"
-                type="number"
-              />
-              <CustomFormField
-                control={form.control}
-                name="PH"
-                label="PH"
-                description="Enter the pH value"
-                placeholder="PH"
-                type="number"
-              />
-            </StackHorizontal>
-            <StackHorizontal className="space-x-5">
-              <CustomFormField
-                control={form.control}
-                name="Humidity"
-                label="Humidity"
-                description="Enter the humidity value"
-                placeholder="Humidity"
-                type="number"
-              />
-              <CustomFormField
-                control={form.control}
-                name="Rainfall"
-                label="Rainfall"
-                description="Enter the rainfall value"
-                placeholder="Rainfall"
-                type="number"
-              />
-            </StackHorizontal>
+            
+           
             <Button type="submit" disabled={isSubmitting}>
               <p className="mr-2">Submit</p>
               {isSubmitting && (
