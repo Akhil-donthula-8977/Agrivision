@@ -3,10 +3,10 @@ import React from 'react';
 import { IoMdClose } from "react-icons/io";
 interface YieldResultCardProps {
     onClose: () => void;
-    data:number[]
+    data:string
 }
 
-const YieldResultCard: React.FC<YieldResultCardProps> = ({ onClose,data }) => {
+const RecommdationCard: React.FC<YieldResultCardProps> = ({ onClose,data }) => {
     return (
         <div className="flex items-center justify-center bg-gray-200">
             <div className="max-w-md p-6 bg-white rounded-lg shadow-lg">
@@ -20,7 +20,7 @@ const YieldResultCard: React.FC<YieldResultCardProps> = ({ onClose,data }) => {
                     </button>
                     </div>
                 <p className="mb-4 text-gray-700">
-                    {data[0]} TONNES PER UNIT HECTARE
+                    {data}
                 </p>
                 <div className="flex justify-end">
                   
@@ -30,4 +30,4 @@ const YieldResultCard: React.FC<YieldResultCardProps> = ({ onClose,data }) => {
     );
 };
 
-export default YieldResultCard;
+export default RecommdationCard;

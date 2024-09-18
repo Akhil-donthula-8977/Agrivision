@@ -37,34 +37,22 @@ const Page = () => {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      console.log(values)
+    
         const response = await fetch('http://127.0.0.1:5000/api/yield/', {
-            method: 'POST', // specify the HTTP method
+            method: 'POST', 
             headers: {
-                'Content-Type': 'application/json' // set the content type to JSON
+                'Content-Type': 'application/json' 
             },
-            body: JSON.stringify(values) // convert the body object to a JSON string
+            body: JSON.stringify(values)
         });
-      //   {
-      //     "Crop": "Coconut",
-      //     "Season": "Whole Year",
-      //     "State": "Assam",
-      //     "Area": 19656,
-      //     "Production": 126905000,
-      //     "Fertilizer": 1970661.52,
-      //     "Pesticide": 6093.36
-      // }
         if (!response.ok) {
             throw new Error(`Network response was not ok: ${response.statusText}`);
         }
 
-        const data = await response.json(); // parse the JSON response
-
-        console.log(data); // handle the parsed JSON data
-
-        // Ensure data is properly structured and contains the prediction
+        const data = await response.json(); 
+       
         if (data && data.prediction) {
-            console.log(data.prediction); // handle the prediction data
+            console.log(data.prediction);
             setData(data.prediction);
         } else {
             console.error('Prediction data is missing from the response:', data);
@@ -72,7 +60,7 @@ const Page = () => {
         
         setIsOpen(true);
     } catch (error) {
-        console.error('There was a problem with the fetch operation:', error); // handle errors
+        console.error('There was a problem with the fetch operation:', error); 
     }
 }
   return (

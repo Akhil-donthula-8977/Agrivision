@@ -12,7 +12,8 @@ import { useSession } from "next-auth/react";
 import { Modal } from "@/components/Modal";
 import { useState } from "react";
 import YieldResultCard from "@/components/cards/YieldResultCard";
-
+import RecommdationCard from "@/components/cards/RecommendationCard";
+import { cropMap } from "@/constants/labelEncodings";
 const formSchema = z.object({
     Nitrogen: z.number().gte(0, {
         message: "Invalid value",
@@ -68,7 +69,7 @@ export default function ProfileForm() {
     const [isOpen,setIsOpen]=useState(false);
     const { handleSubmit, formState: { isSubmitting, isValid } } = form;
     const session=useSession();
-    const [data,setData]=useState([]);
+    const [data,setData]=useState("");
     async function onSubmit(values: z.infer<typeof formSchema>) {
         try {
             const query={
@@ -87,27 +88,20 @@ export default function ProfileForm() {
                   },
                   body: JSON.stringify(query) // convert the body object to a JSON string
               });
-            //   {
-            //     "Crop": "Coconut",
-            //     "Season": "Whole Year",
-            //     "State": "Assam",
-            //     "Area": 19656,
-            //     "Production": 126905000,
-            //     "Fertilizer": 1970661.52,
-            //     "Pesticide": 6093.36
-            // }
               if (!response.ok) {
                   throw new Error(`Network response was not ok: ${response.statusText}`);
               }
       
               const data = await response.json(); // parse the JSON response
       
-              console.log(data); // handle the parsed JSON data
+              console.log("data:",data); // handle the parsed JSON data
       
               // Ensure data is properly structured and contains the prediction
               if (data && data.prediction) {
                   console.log(data.prediction); // handle the prediction data
-                  setData(data.prediction);
+                  var num=parseInt(data.prediction);
+                  console.log(num)
+                  setData(cropMap[num]);
               } else {
                   console.error('Prediction data is missing from the response:', data);
               }
@@ -120,7 +114,7 @@ export default function ProfileForm() {
 
     return (
         <section className="flex flex-col justify-center mt-10 mb-5">
-           <Modal  isOpen={isOpen} onClose={() => setIsOpen(false)} component={<YieldResultCard data={data} onClose={() => setIsOpen(false)}></YieldResultCard>}></Modal>
+           <Modal  isOpen={isOpen} onClose={() => setIsOpen(false)} component={<RecommdationCard data={data} onClose={() => setIsOpen(false)}></RecommdationCard>}></Modal>
             <div className="flex justify-center">
                 <Form {...form}>
                     <form onSubmit={handleSubmit(onSubmit)} className={cn("space-y-4 ", nunito.className)}>

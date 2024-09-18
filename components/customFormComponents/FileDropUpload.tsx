@@ -3,10 +3,13 @@ import { nunito } from '@/lib/fontsCustom';
 import React, { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Button } from '../ui/button';
+import { Modal } from '../Modal';
 const FileUpload: React.FC = () => {
     const [imagePreviews, setImagePreviews] = useState<string[]>([]);
     const [disableFileUpload, setDisableFileUpload] = useState<boolean>(false);
     const [isSubmitting,setIsSubmitting]=useState<boolean>(false);
+    const [isOpen,setIsOpen]=useState(false);
+    const [res,setRes]=useState({});
     const {
         acceptedFiles,
         fileRejections,
@@ -31,17 +34,42 @@ const FileUpload: React.FC = () => {
                 });
             });
             console.log(previews)
-
             Promise.all(previews).then((urls) => setImagePreviews(urls));
         },
         onDropAccepted: () => {
+            console.log(imagePreviews)
             console.log("fileAccepted");
             setDisableFileUpload(true);
         }
     });
 
+    const handleSubmit = async (imgp: string[]) => {
+        try {
+            const response = await fetch('http://127.0.0.1:5000/api/h5_model/', {
+                method: 'POST', 
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ "image": imgp[0] })
+            });
+    
+            const data = await response.json();
+            console.log('Response Data:', data); // Debug log
+    
+            if (response.ok) {
+                setRes(data); // Update state with response data
+            } else {
+                console.error('Error:', data);
+            }
+        } catch (error) {
+            console.error('Fetch error:', error);
+        }
+        setIsOpen(true);
+    }
+    
     return (
         <section className={`container mx-auto p-4 ${nunito.className} `}>
+     <Modal  isOpen={isOpen} onClose={() => setIsOpen(false)} component={<div  className='bg-white w-[50%] h-auto break-words'>{JSON.stringify(res)}</div>} />
             <h1 className='font-bold text-xl'>Upload imgae here:</h1>
             <div
                 {...getRootProps({
@@ -87,7 +115,9 @@ const FileUpload: React.FC = () => {
                     ))}
                 </div>
             </div>
-            <Button type="submit" className='relative sm:top-12' disabled={isSubmitting}>
+            <Button type="submit" className='relative sm:top-12' onClick={()=>{
+                handleSubmit(imagePreviews)
+                }} disabled={isSubmitting}>
                 <p className="mr-2">Submit</p>
                 {isSubmitting && (
                     <svg
