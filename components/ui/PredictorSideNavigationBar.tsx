@@ -43,7 +43,7 @@ const PredictorSideNavigationBar = () => {
                             <Link
                                 key={index}
                                 href={data.url}
-                                className={`flex items-center p-4 ${isOpen ? 'justify-start' : 'justify-center'} hover:bg-green-600`}
+                                className={`flex items-center ${pathname.includes(data.url) ?"bg-green-900" :""} p-4 ${isOpen ? 'justify-start' : 'justify-center'} hover:bg-green-600`}
                             >
                                 {data.icon}
                                 {isOpen && <span className='ml-1'>{data.name}</span>}

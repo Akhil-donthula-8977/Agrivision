@@ -37,7 +37,6 @@ export const { handlers, auth,signIn,signOut } = NextAuth({
             return newUser;
           }
 
-          // Return JSON object with the user data
           return user;
         } catch (error) {
           
@@ -46,10 +45,6 @@ export const { handlers, auth,signIn,signOut } = NextAuth({
           return null;
         }
       },
-    }),
-    GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     }),
   ],
   pages: {

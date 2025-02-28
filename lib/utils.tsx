@@ -6,6 +6,7 @@ import { FaDisease } from "react-icons/fa6";
 import { StaticImageData } from "next/image";
 import img  from "@/public/Akhil.png"
 import { AiOutlineRise } from "react-icons/ai";
+import { TbBrandCashapp } from "react-icons/tb";
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
@@ -35,6 +36,11 @@ export const PredictorNavList:PredictorNavListItem[]=[
     name:"Predict Yield",
     url:"/predictors/yield-predction",
     icon: <AiOutlineRise className="text-md " />
+  },
+  {
+    name:"predict crop price",
+    url:"/predictors/price-prediction",
+    icon: <TbBrandCashapp className="text-md " />
   },
 
 ]

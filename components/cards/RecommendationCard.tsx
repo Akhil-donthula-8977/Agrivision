@@ -3,7 +3,7 @@ import React from 'react';
 import { IoMdClose } from "react-icons/io";
 interface YieldResultCardProps {
     onClose: () => void;
-    data:string
+    data:string|number
 }
 
 const RecommdationCard: React.FC<YieldResultCardProps> = ({ onClose,data }) => {

@@ -19,11 +19,8 @@ const Navbar = () => {
 
   // Array containing navigation items
   const navItems = [
-    { id: 1, text: 'Home' },
-    { id: 2, text: 'Company' },
-    { id: 3, text: 'Resources' },
-    { id: 4, text: 'About' },
-    { id: 5, text: 'Contact' },
+    { id: 1, text: 'Home',url:"/predictors" },
+   
   ];
 
   return (
@@ -34,12 +31,13 @@ const Navbar = () => {
       {/* Desktop Navigation */}
       <ul className='hidden md:flex items-center'>
         {navItems.map(item => (
-          <li
+          <Link
             key={item.id}
             className='p-4 hover:bg-[#00df9a] rounded-xl m-2 cursor-pointer duration-300 hover:text-black'
+            href={item.url}
           >
             {item.text}
-          </li>
+          </Link>
         ))}
         <Button onClick={() => signOut()}>Signout</Button>
       </ul>
@@ -59,7 +57,7 @@ const Navbar = () => {
       >
         
         {/* Mobile Logo */}
-        <h1 className='w-full text-3xl font-bold text-[#00df9a] m-4'>REACT.</h1>
+        <h1 className='w-full text-3xl font-bold text-[#00df9a] m-4'>Agrivision</h1>
 
         {/* Mobile Navigation Items */}
         {navItems.map(item => (

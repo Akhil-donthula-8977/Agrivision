@@ -1,15 +1,17 @@
-
 import { nunito } from '@/lib/fontsCustom';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Button } from '../ui/button';
 import { Modal } from '../Modal';
+import DiseaseResultCaard from '../cards/DiseaseResultCaard';
+
 const FileUpload: React.FC = () => {
     const [imagePreviews, setImagePreviews] = useState<string[]>([]);
     const [disableFileUpload, setDisableFileUpload] = useState<boolean>(false);
-    const [isSubmitting,setIsSubmitting]=useState<boolean>(false);
-    const [isOpen,setIsOpen]=useState(false);
-    const [res,setRes]=useState({});
+    const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+    const [isOpen, setIsOpen] = useState(false);
+    const [res, setRes] = useState({});
+
     const {
         acceptedFiles,
         fileRejections,
@@ -33,31 +35,40 @@ const FileUpload: React.FC = () => {
                     reader.readAsDataURL(file);
                 });
             });
-            console.log(previews)
-            Promise.all(previews).then((urls) => setImagePreviews(urls));
+            Promise.all(previews).then((urls) => {
+            console.log(urls)
+                setImagePreviews(urls)
+            });
         },
         onDropAccepted: () => {
-            console.log(imagePreviews)
-            console.log("fileAccepted");
             setDisableFileUpload(true);
         }
     });
 
+    useEffect(() => {
+        const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+            setImagePreviews([]);
+            setDisableFileUpload(false);
+        };
+        window.addEventListener('beforeunload', handleBeforeUnload);
+        return () => {
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+        };
+    }, []);
+
     const handleSubmit = async (imgp: string[]) => {
         try {
             const response = await fetch('http://127.0.0.1:5000/api/h5_model/', {
-                method: 'POST', 
+                method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ "image": imgp[0] })
+                body: JSON.stringify({ image: imagePreviews[0] }),
             });
-    
+
             const data = await response.json();
-            console.log('Response Data:', data); // Debug log
-    
             if (response.ok) {
-                setRes(data); // Update state with response data
+                setRes(data.prediction);
             } else {
                 console.error('Error:', data);
             }
@@ -65,11 +76,11 @@ const FileUpload: React.FC = () => {
             console.error('Fetch error:', error);
         }
         setIsOpen(true);
-    }
-    
+    };
+
     return (
         <section className={`container mx-auto p-4 ${nunito.className} `}>
-     <Modal  isOpen={isOpen} onClose={() => setIsOpen(false)} component={<div  className='bg-white w-[50%] h-auto break-words'>{JSON.stringify(res)}</div>} />
+     <Modal  isOpen={isOpen} onClose={() => setIsOpen(false)} component={<DiseaseResultCaard onClose={() => setIsOpen(false)} data={JSON.stringify(res)}></DiseaseResultCaard>} />
             <h1 className='font-bold text-xl'>Upload imgae here:</h1>
             <div
                 {...getRootProps({
@@ -142,4 +153,4 @@ const FileUpload: React.FC = () => {
     );
 };
 
-export default FileUpload;
+export default React.memo(FileUpload);
